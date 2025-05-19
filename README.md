@@ -1,7 +1,6 @@
 ![MIT](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)
-![Version](https://img.shields.io/github/package-json/v/alienfast/vite-plugin-i18next-loader?style=for-the-badge)
-![CI](https://img.shields.io/github/actions/workflow/status/alienfast/vite-plugin-i18next-loader/build.yml?style=for-the-badge)
-![PRs Welcome](https://img.shields.io/badge/PRs-Welcome-brightgreen.svg?style=for-the-badge)
+![Version](https://img.shields.io/github/package-json/v/ensdomains/vite-plugin-i18next-loader?style=for-the-badge)
+![CI](https://img.shields.io/github/actions/workflow/status/ensdomains/vite-plugin-i18next-loader/build.yml?style=for-the-badge)
 
 # vite-plugin-i18next-loader
 
@@ -17,13 +16,12 @@ This vite-plugin i18next loader generates the `resources` structure necessary fo
 - [x] One to many overrides supporting reuse cases (locales in library packages/white labeling)
 - [x] Yaml and Json support
 - [x] HMR hot module reloading
-- [ ] Better chunking/tree shaking may already be possible, see https://github.com/alienfast/vite-plugin-i18next-loader/issues/4 - needs more trial/discussion.
 
 Given a locales directory, by default, the loader will find and parse any `json|yaml|yml` file and attribute the
 contents to the containing lang folder e.g. `en`. There is no need to add lang such as `en` or `de` inside your
 `json` or `yaml` files.
 
-See the [`test/data` directory](https://github.com/alienfast/vite-plugin-i18next-loader/tree/main/src/__tests__/data) for structure and example data.
+See the [`test/data` directory](https://github.com/ensdomains/vite-plugin-i18next-loader/tree/main/src/__tests__/data) for structure and example data.
 
 ## Usage
 
@@ -383,4 +381,4 @@ declare module 'virtual:*'
 
 ## Credit
 
-This was forked from [@alienfast/i18next-loader](https://github.com/alienfast/i18next-loader/), converted to be a vite plugin and improved. Thanks to the original authors and contributors.
+This was forked from [@ensdomains/i18next-loader](https://github.com/ensdomains/i18next-loader/), converted to be a vite plugin and improved. Thanks to the original authors and contributors.
