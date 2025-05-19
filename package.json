@@ -1,15 +1,11 @@
 {
-  "name": "vite-plugin-i18next-loader",
+  "name": "@ensdomains/vite-plugin-i18next-loader",
   "version": "3.1.2",
   "description": "Vite plugin loader for client embedded i18next locales composited from one to many json or yaml files.",
   "type": "module",
-  "main-note": "Though this is ESM only, the following main is to appease tsc and varieties of moduleResolution e.g. node vs nodenext, otherwise types aren't found. see https://github.com/rosskevin/ts-esm-workspaces/tree/bug-main-required-to-build#workaround ",
-  "main": "./dist/index.js",
   "exports": {
-    ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.js"
-    }
+    "types": "./dist/index.d.ts",
+    "import": "./dist/index.js"
   },
   "sideEffects": false,
   "publishConfig": {
@@ -29,8 +25,8 @@
     "json"
   ],
   "license": "MIT",
-  "repository": "https://github.com/alienfast/vite-plugin-i18next-loader",
-  "homepage": "https://github.com/alienfast/vite-plugin-i18next-loader",
+  "repository": "https://github.com/ensdomains/vite-plugin-i18next-loader",
+  "homepage": "https://github.com/ensdomains/vite-plugin-i18next-loader",
   "peerDependencies": {
     "vite": ">=3.1.6"
   },
@@ -53,6 +49,5 @@
     "vite": "^6.1.0",
     "vitest": "^3.1.4"
   },
-  "author": "Kevin Ross <kevin.ross@alienfast.com>",
   "packageManager": "pnpm@10.10.0+sha512.d615db246fe70f25dcfea6d8d73dee782ce23e2245e3c4f6f888249fb568149318637dca73c2c5c8ef2a4ca0d5657fb9567188bfab47f566d1ee6ce987815c39"
 }
