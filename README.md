@@ -381,4 +381,4 @@ declare module 'virtual:*'
 
 ## Credit
 
-This was forked from [@ensdomains/i18next-loader](https://github.com/ensdomains/i18next-loader/), converted to be a vite plugin and improved. Thanks to the original authors and contributors.
+This was forked from [@alienfast/i18next-loader](https://github.com/alienfast/i18next-loader/), converted to be a vite plugin and improved. Thanks to the original authors and contributors.
