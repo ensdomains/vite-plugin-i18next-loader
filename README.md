@@ -4,7 +4,9 @@
 
 # vite-plugin-i18next-loader
 
-`yarn add -D vite-plugin-i18next-loader`
+```
+pnpm add -D @ensdomains/vite-plugin-i18next-loader
+```
 
 Vite plugin to client bundle i18next locales composited from one to many json/yaml files _from_ one to many libraries. Zero config HMR support included.
 
