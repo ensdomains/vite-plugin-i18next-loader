@@ -16,14 +16,9 @@
     "access": "public"
   },
   "scripts": {
-    "build": "yarn clean && tsup-node",
-    "build:ide": "echo 'tsc -b' && tsc -b",
-    "clean": "tsx ./scripts/clean.ts",
-    "clean:yarn": "tsx ./scripts/clean-yarn.ts",
-    "reset": "tsx ./scripts/reset.ts",
-    "lint:fix": "eslint . --cache --fix",
-    "test": "vitest",
-    "release": "yarn auto shipit"
+    "build": "tsc -p tsconfig.build.json",
+    "lint:fix": "biome check --fix",
+    "test": "vitest"
   },
   "keywords": [
     "vite-plugin",
@@ -36,59 +31,28 @@
   "license": "MIT",
   "repository": "https://github.com/alienfast/vite-plugin-i18next-loader",
   "homepage": "https://github.com/alienfast/vite-plugin-i18next-loader",
-  "maintainers": [
-    {
-      "name": "Kevin Ross",
-      "email": "kevin.ross@alienfast.com"
-    }
-  ],
   "peerDependencies": {
     "vite": ">=3.1.6"
   },
   "dependencies": {
-    "dot-prop": "^9.0.0",
-    "glob": "^11.0.1",
+    "dset": "^3.1.4",
     "js-yaml": "^4.1.0",
     "marked": "^15.0.6",
     "marked-terminal": "^7.3.0",
+    "tinyglobby": "^0.2.13",
     "ts-deepmerge": "^7.0.2"
   },
   "devDependencies": {
-    "@alienfast/eslint-config": "^5.2.5",
-    "@alienfast/prettier-config": "^1.0.2",
-    "@alienfast/tsconfig": "^1.0.4",
-    "@auto-it/all-contributors": "^11.3.0",
-    "@auto-it/first-time-contributor": "^11.3.0",
-    "@auto-it/released": "^11.3.0",
+    "@biomejs/biome": "2.0.0-beta.3",
     "@types/js-yaml": "^4.0.9",
-    "@types/marked": "^6",
+    "@types/marked-terminal": "^6.1.1",
     "@types/node": "^22.13.1",
-    "@types/rimraf": "^4",
-    "@typescript-eslint/eslint-plugin": "^8.23.0",
-    "auto": "^11.3.0",
-    "eslint": "^9.19.0",
-    "execa": "^9.5.2",
-    "i18next": "^24.2.2",
-    "npm-run-all": "^4.1.5",
-    "prettier": "^3.4.2",
-    "rimraf": "^6.0.1",
-    "rollup": "^4.34.5",
-    "tsup": "^8.3.6",
-    "tsx": "^4.19.2",
+    "i18next": "^25.2.0",
+    "tsup": "^8.5.0",
     "typescript": "^5.7.3",
-    "typescript-eslint": "^8.23.0",
     "vite": "^6.1.0",
-    "vitest": "^3.0.5"
+    "vitest": "^3.1.4"
   },
   "author": "Kevin Ross <kevin.ross@alienfast.com>",
-  "auto": {
-    "plugins": [
-      "npm",
-      "all-contributors",
-      "first-time-contributor",
-      "released"
-    ]
-  },
-  "packageManager": "yarn@4.5.3",
-  "prettier": "@alienfast/prettier-config"
+  "packageManager": "pnpm@10.10.0+sha512.d615db246fe70f25dcfea6d8d73dee782ce23e2245e3c4f6f888249fb568149318637dca73c2c5c8ef2a4ca0d5657fb9567188bfab47f566d1ee6ce987815c39"
 }

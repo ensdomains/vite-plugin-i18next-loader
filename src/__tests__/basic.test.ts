@@ -7,12 +7,15 @@ import { beforeEach, describe, expect, it } from 'vitest'
 
 import factory from '../index.js'
 import { resolvedVirtualModuleId } from '../utils.js'
-import { esm, ThisScope } from './util.js'
+import { esm, type ThisScope } from './util.js'
 
 describe('basic', () => {
   for (const type of ['yaml', 'json']) {
     // eslint-disable-next-line unicorn/prefer-module
-    const appLocalesDir = path.join(__dirname, `./data/basic-app-${type}/locales`)
+    const appLocalesDir = path.join(
+      __dirname,
+      `./data/basic-app-${type}/locales`,
+    )
     describe(type, () => {
       let thisScope: ThisScope
 
@@ -32,14 +35,20 @@ describe('basic', () => {
 
       it.concurrent('should generate the structure', async () => {
         const load = factory({ paths: [appLocalesDir] }).load
-        const res = (load as any).call(thisScope, resolvedVirtualModuleId) as string
+        const res = (load as any).call(
+          thisScope,
+          resolvedVirtualModuleId,
+        ) as string
         const resStore = await import(esm(res))
         assertCommon(resStore)
       })
 
       it.concurrent('should process include', () => {
-        const load = factory({ paths: [appLocalesDir], include: ['**/*.json'] }).load
-        thisScope.addWatchFile = function (path) {
+        const load = factory({
+          paths: [appLocalesDir],
+          include: ['**/*.json'],
+        }).load
+        thisScope.addWatchFile = (path) => {
           expect(path).not.toMatch(/main\.nonjson/)
         }
 
@@ -52,11 +61,14 @@ describe('basic', () => {
           include: [`**/*.${type}`],
           ignore: [`**/exclude.${type}`],
         }).load
-        thisScope.addWatchFile = function (path) {
+        thisScope.addWatchFile = (path) => {
           expect(path).not.toMatch(/exclude\.json/)
         }
 
-        const res = (load as any).call(thisScope, resolvedVirtualModuleId) as string
+        const res = (load as any).call(
+          thisScope,
+          resolvedVirtualModuleId,
+        ) as string
         const resStore = await import(esm(res))
         expect(resStore.de.main.foo).toStrictEqual(undefined)
         assertCommon(resStore)

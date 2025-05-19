@@ -1,9 +1,16 @@
 {
-  "search.exclude": {
-    "**/.yarn": true,
-    "**/.pnp.*": true
-  },
   "typescript.tsdk": "node_modules/typescript/lib",
   "typescript.enablePromptUseWorkspaceTsdk": true,
-  "testing.automaticallyOpenPeekView": "never"
+  "testing.automaticallyOpenPeekView": "never",
+  "i18n-ally.localesPaths": [
+    "src/__tests__/data/override-app-yaml/locales",
+    "src/__tests__/data/basic-app-yaml/locales",
+    "src/__tests__/data/basic-app-json/locales",
+    "src/__tests__/data/override-app-json/locales",
+    "src/__tests__/data/relativePathAsNamespace-json/locales",
+    "src/__tests__/data/relativePathAsNamespace-yaml/locales"
+  ],
+  "biome.enabled": true,
+  "prettier.enable": false,
+  "eslint.enable": false
 }

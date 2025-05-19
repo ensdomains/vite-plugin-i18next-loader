@@ -1,12 +1,9 @@
 import path from 'node:path'
-
-import { setProperty } from 'dot-prop'
-import { IgnoreLike } from 'glob'
-import { marked } from 'marked'
-import TerminalRenderer from 'marked-terminal'
+import { dset } from 'dset'
+import { type MarkedExtension, marked } from 'marked'
+import { markedTerminal } from 'marked-terminal'
 import { merge } from 'ts-deepmerge'
-import { createLogger, LogLevel, Plugin } from 'vite'
-
+import { createLogger, type LogLevel, type Plugin } from 'vite'
 import {
   assertExistence,
   enumerateLangs,
@@ -18,10 +15,7 @@ import {
   virtualModuleId,
 } from './utils.js'
 
-marked.setOptions({
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-assignment
-  renderer: new TerminalRenderer(),
-})
+marked.use(markedTerminal() as MarkedExtension)
 
 // unfortunately not exported
 export const LogLevels: Record<LogLevel, number> = {
@@ -49,9 +43,8 @@ export interface Options {
   /**
    * Glob patterns to exclude/ignore
    *
-   * @see https://github.com/isaacs/node-glob
    */
-  ignore?: string | string[] | IgnoreLike
+  ignore?: string | string[]
 
   /**
    * Locale top level directory paths ordered from least specialized to most specialized
@@ -76,7 +69,9 @@ let loadedFiles: string[] = []
 let allLangs: Set<string> = new Set()
 
 const factory = (options: Options) => {
-  const log = createLogger(options.logLevel || 'warn', { prefix: '[i18next-loader]' })
+  const log = createLogger(options.logLevel || 'warn', {
+    prefix: '[i18next-loader]',
+  })
 
   function loadLocales() {
     const localeDirs = resolvePaths(options.paths, process.cwd())
@@ -114,14 +109,19 @@ const factory = (options: Options) => {
           if (options.namespaceResolution) {
             let namespaceFilepath: string = langFile
             if (options.namespaceResolution === 'relativePath') {
-              namespaceFilepath = path.relative(path.join(nextLocaleDir, lang), langFile)
+              namespaceFilepath = path.relative(
+                path.join(nextLocaleDir, lang),
+                langFile,
+              )
             } else if (options.namespaceResolution === 'basename') {
               namespaceFilepath = path.basename(langFile)
             }
             const extname = path.extname(langFile)
-            const namespaceParts = namespaceFilepath.replace(extname, '').split(path.sep)
+            const namespaceParts = namespaceFilepath
+              .replace(extname, '')
+              .split(path.sep)
             const namespace = [lang].concat(namespaceParts).join('.')
-            setProperty(resBundle, namespace, content)
+            dset(resBundle, namespace, content)
           } else {
             resBundle[lang] = content
           }
