@@ -3,10 +3,8 @@
   "version": "4.0.1",
   "description": "Vite plugin loader for client embedded i18next locales composited from one to many json or yaml files.",
   "type": "module",
-  "exports": {
-    "types": "./dist/index.d.ts",
-    "import": "./dist/index.js"
-  },
+  "exports": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "sideEffects": false,
   "publishConfig": {
     "access": "public"
