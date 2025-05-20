@@ -1,6 +1,6 @@
 {
   "name": "@ensdomains/vite-plugin-i18next-loader",
-  "version": "4.0.1",
+  "version": "4.0.2",
   "description": "Vite plugin loader for client embedded i18next locales composited from one to many json or yaml files.",
   "type": "module",
   "exports": "./dist/index.js",
