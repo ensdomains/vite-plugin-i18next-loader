@@ -100,7 +100,7 @@ const factory = (options: Options) => {
 
         for (const langFile of langFiles) {
           loadedFiles.push(langFile) // track for fast hot reload matching
-          log.info('\t' + langFile, {
+          log.info(`\t${langFile}`, {
             timestamp: true,
           })
 

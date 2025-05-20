@@ -5,7 +5,7 @@ import { globSync } from 'tinyglobby'
 
 // don't export these from index so the external types are cleaner
 export const virtualModuleId = 'virtual:i18next-loader'
-export const resolvedVirtualModuleId = '\0' + virtualModuleId
+export const resolvedVirtualModuleId = `\0${virtualModuleId}`
 
 export function jsNormalizedLang(lang: string) {
   return lang.replace(/-/g, '_')

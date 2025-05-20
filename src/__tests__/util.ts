@@ -33,5 +33,5 @@ export type LoaderPlugin = WithRequired<Plugin, 'load'>
 // }
 
 export function esm(js: string) {
-  return 'data:text/javascript;base64,' + btoa(js)
+  return `data:text/javascript;base64,${btoa(js)}`
 }
