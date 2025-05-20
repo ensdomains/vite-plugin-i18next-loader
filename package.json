@@ -14,6 +14,7 @@
     "lint:fix": "biome check --fix",
     "test": "vitest"
   },
+  "files": ["dist"],
   "keywords": [
     "vite-plugin",
     "loader",
