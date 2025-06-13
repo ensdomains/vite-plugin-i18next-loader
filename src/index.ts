@@ -62,7 +62,7 @@ export interface Options {
 
   /**
    * Path to output TypeScript type definitions file
-   * 
+   *
    * When specified, the plugin will generate a .d.ts file with type definitions
    * for the language resources instead of runtime values.
    */
@@ -70,11 +70,11 @@ export interface Options {
 
   /**
    * Language to use for TypeScript type generation
-   * 
+   *
    * When typeOutputPath is specified, this determines which language's
    * literal values will be used for the type definitions. This enables
    * type-safe i18next usage with proper key checking and return types.
-   * 
+   *
    * Default: first language found
    */
   typeLanguage?: string
@@ -88,12 +88,18 @@ export interface ResBundle {
 let loadedFiles: string[] = []
 let allLangs: Set<string> = new Set()
 
-function generateTypeDefinitions(appResBundle: ResBundle, allLangs: Set<string>, typeLanguage?: string): string {
+function generateTypeDefinitions(
+  appResBundle: ResBundle,
+  allLangs: Set<string>,
+  typeLanguage?: string,
+): string {
   // Determine which language to use for type generation
   const targetLang = typeLanguage || Array.from(allLangs)[0]
-  
+
   if (!targetLang || !appResBundle[targetLang]) {
-    throw new Error(`Language '${targetLang}' not found in resource bundle. Available languages: ${Array.from(allLangs).join(', ')}`)
+    throw new Error(
+      `Language '${targetLang}' not found in resource bundle. Available languages: ${Array.from(allLangs).join(', ')}`,
+    )
   }
 
   return `/* eslint-disable */
@@ -119,34 +125,34 @@ const factory = (options: Options) => {
     const localeDirs = resolvePaths(options.paths, process.cwd())
     assertExistence(localeDirs)
 
-    //
     let appResBundle: ResBundle = {}
     loadedFiles = [] // reset
+    allLangs = new Set() // reset
+
     log.info('Bundling locales (ordered least specific to most):', {
       timestamp: true,
     })
-    localeDirs.forEach((nextLocaleDir) => {
-      // all subdirectories match language codes
-      const langs = enumerateLangs(nextLocaleDir)
-      allLangs = new Set([...allLangs, ...langs])
-      for (const lang of langs) {
-        const resBundle: ResBundle = {}
-        resBundle[lang] = {}
 
-        const langDir = path.join(nextLocaleDir, lang) // top level lang dir
+    localeDirs.forEach((nextLocaleDir) => {
+      const langs = enumerateLangs(nextLocaleDir)
+      langs.forEach((lang) => allLangs.add(lang))
+
+      for (const lang of langs) {
+        const langDir = path.join(nextLocaleDir, lang)
         const langFiles = findAll(
           options.include || ['**/*.json', '**/*.yml', '**/*.yaml'],
           langDir,
           options.ignore,
-        ) // all lang files matching patterns in langDir
+        )
 
         for (const langFile of langFiles) {
-          loadedFiles.push(langFile) // track for fast hot reload matching
+          loadedFiles.push(langFile)
           log.info(`\t${langFile}`, {
             timestamp: true,
           })
 
           const content = loadAndParse(langFile)
+          const resourceToMerge: ResBundle = {}
 
           if (options.namespaceResolution) {
             let namespaceFilepath: string = langFile
@@ -162,12 +168,11 @@ const factory = (options: Options) => {
             const namespaceParts = namespaceFilepath
               .replace(extname, '')
               .split(path.sep)
-            const namespace = [lang].concat(namespaceParts).join('.')
-            dset(resBundle, namespace, content)
+            dset(resourceToMerge, [lang, ...namespaceParts].join('.'), content)
           } else {
-            resBundle[lang] = content
+            resourceToMerge[lang] = content
           }
-          appResBundle = merge(appResBundle, resBundle)
+          appResBundle = merge(appResBundle, resourceToMerge)
         }
       }
     })
@@ -209,21 +214,70 @@ ${bundle}
 
     // Generate and write TypeScript type definitions if requested
     if (options.typeOutputPath) {
-      const typeDefinitions = generateTypeDefinitions(appResBundle, allLangs, options.typeLanguage)
-      
+      const typeDefinitions = generateTypeDefinitions(
+        appResBundle,
+        allLangs,
+        options.typeLanguage,
+      )
+
       // Ensure the directory exists
       const typeOutputDir = path.dirname(options.typeOutputPath)
       if (!fs.existsSync(typeOutputDir)) {
         fs.mkdirSync(typeOutputDir, { recursive: true })
       }
-      
+
       fs.writeFileSync(options.typeOutputPath, typeDefinitions)
       log.info(`Generated TypeScript types at: ${options.typeOutputPath}`, {
         timestamp: true,
       })
     }
 
-    return bundle
+    return appResBundle
+  }
+
+  function generateAndWriteTypes(
+    appResBundle: ResBundle,
+    allLangs: Set<string>,
+  ) {
+    if (!options.typeOutputPath) return
+
+    const typeDefinitions = generateTypeDefinitions(
+      appResBundle,
+      allLangs,
+      options.typeLanguage,
+    )
+
+    // Ensure the directory exists
+    const typeOutputDir = path.dirname(options.typeOutputPath)
+    if (!fs.existsSync(typeOutputDir)) {
+      fs.mkdirSync(typeOutputDir, { recursive: true })
+    }
+
+    fs.writeFileSync(options.typeOutputPath, typeDefinitions)
+    log.info(`Generated TypeScript types at: ${options.typeOutputPath}`, {
+      timestamp: true,
+    })
+  }
+
+  function generateBundle(
+    appResBundle: ResBundle,
+    allLangs: Set<string>,
+  ): string {
+    // named exports, requires manipulation of names
+    let namedBundle = ''
+    for (const lang of allLangs) {
+      namedBundle += `export const ${jsNormalizedLang(lang)} = ${JSON.stringify(
+        appResBundle[lang],
+      )}\n`
+    }
+    let defaultExport = 'const resources = { \n'
+    for (const lang of allLangs) {
+      defaultExport += `"${lang}": ${jsNormalizedLang(lang)},\n`
+    }
+    defaultExport += '}'
+    defaultExport += '\nexport default resources\n'
+
+    return namedBundle + defaultExport
   }
 
   const plugin: Plugin = {
@@ -239,7 +293,27 @@ ${bundle}
         return null
       }
 
-      const bundle = loadLocales()
+      const appResBundle = loadLocales()
+      const bundle = generateBundle(appResBundle, allLangs)
+
+      log.info(`Locales module '${resolvedVirtualModuleId}':`, {
+        timestamp: true,
+      })
+
+      // emulate log.info for our marked terminal output
+      if (LogLevels[options.logLevel || 'warn'] >= LogLevels['info']) {
+        // eslint-disable-next-line no-console
+        console.log(
+          marked(`
+\`\`\`js
+${bundle}
+\`\`\`
+`),
+        )
+      }
+
+      generateAndWriteTypes(appResBundle, allLangs)
+
       for (const file of loadedFiles) {
         this.addWatchFile(file)
       }
