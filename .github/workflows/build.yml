@@ -5,16 +5,8 @@ on:
   - pull_request
 
 jobs:
-  # Run install in one step so deps can be cached for other steps
-  install:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: ./.github/actions/setup
-
   build:
     runs-on: ubuntu-latest
-    needs: install
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -29,17 +21,18 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: 'pnpm'
+          cache: "pnpm"
 
       - name: Install dependencies
         run: pnpm install
+
+      - name: Build
         run: pnpm build
 
   test:
     runs-on: ubuntu-latest
     needs: build
     steps:
-      steps:
       - name: Checkout
         uses: actions/checkout@v4
 
@@ -53,8 +46,10 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: 'pnpm'
+          cache: "pnpm"
 
       - name: Install dependencies
         run: pnpm install
-      - run: pnpm test
+
+      - name: Test
+        run: pnpm test
