@@ -1,3 +1,4 @@
+import fsp from 'node:fs/promises'
 import path from 'node:path'
 import { dset } from 'dset'
 import { type MarkedExtension, marked } from 'marked'
@@ -14,7 +15,6 @@ import {
   resolvePaths,
   virtualModuleId,
 } from './utils.js'
-import fsp from 'node:fs/promises'
 
 marked.use(markedTerminal() as MarkedExtension)
 
@@ -103,6 +103,7 @@ function generateTypeDefinitions(
   }
 
   return `/* eslint-disable */
+// biome-ignore-all lint assist: Ignore generated file
 
 // @ts-nocheck
 
