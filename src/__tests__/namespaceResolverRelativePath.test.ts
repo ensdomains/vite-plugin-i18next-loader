@@ -42,10 +42,10 @@ describe('namespaceResolverRelativePath', () => {
           paths: [appLocalesDir],
           namespaceResolution: 'relativePath',
         }).load
-        const res = (load as any).call(
+        const res = (await (load as any).call(
           thisScope,
           resolvedVirtualModuleId,
-        ) as string
+        )) as string
         const resStore = await import(esm(res))
         assertCommon(resStore)
       })
