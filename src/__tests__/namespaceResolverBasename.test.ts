@@ -39,7 +39,10 @@ describe('namespaceResolverBasename', () => {
           paths: [appLocalesDir],
           namespaceResolution: 'basename',
         }).load
-        const res = (load as any).call(thisScope, resolvedVirtualModuleId)
+        const res = (await (load as any).call(
+          thisScope,
+          resolvedVirtualModuleId,
+        )) as string
         const resStore = await import(esm(res))
         assertCommon(resStore)
       })

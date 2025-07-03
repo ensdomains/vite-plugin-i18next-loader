@@ -28,10 +28,10 @@ describe('pathOverride', () => {
 
       it.concurrent('should load the app locales', async () => {
         const load = factory({ paths: [appLocalesDir] }).load
-        const res = (load as any).call(
+        const res = (await (load as any).call(
           thisScope,
           resolvedVirtualModuleId,
-        ) as string
+        )) as string
         const resStore = (await import(esm(res))) as any
         expect(resStore.en.foo.test).toStrictEqual('app foo.test en')
         expect(resStore.en.main.sub.subsub.slugslug).toStrictEqual(
@@ -50,10 +50,10 @@ describe('pathOverride', () => {
             appLocalesDir,
           ],
         }).load
-        const res = (load as any).call(
+        const res = (await (load as any).call(
           thisScope,
           resolvedVirtualModuleId,
-        ) as string
+        )) as string
         const resStore = await import(esm(res))
         expect(resStore.en.main.sub.test).toStrictEqual('lib sub.test en')
         expect(resStore.en.main.sub.subsub.test).toStrictEqual(

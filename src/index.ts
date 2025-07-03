@@ -14,7 +14,7 @@ import {
   resolvePaths,
   virtualModuleId,
 } from './utils.js'
-import fs from 'node:fs'
+import fsp from 'node:fs/promises'
 
 marked.use(markedTerminal() as MarkedExtension)
 
@@ -86,7 +86,7 @@ export interface ResBundle {
 
 // for fast match on hot reloading check?
 let loadedFiles: string[] = []
-let allLangs: Set<string> = new Set()
+let allLangs = new Set<string>()
 
 function generateTypeDefinitions(
   appResBundle: ResBundle,
@@ -127,7 +127,7 @@ const factory = (options: Options) => {
 
     let appResBundle: ResBundle = {}
     loadedFiles = [] // reset
-    allLangs = new Set() // reset
+    allLangs = new Set<string>() // reset
 
     log.info('Bundling locales (ordered least specific to most):', {
       timestamp: true,
@@ -212,30 +212,10 @@ ${bundle}
       )
     }
 
-    // Generate and write TypeScript type definitions if requested
-    if (options.typeOutputPath) {
-      const typeDefinitions = generateTypeDefinitions(
-        appResBundle,
-        allLangs,
-        options.typeLanguage,
-      )
-
-      // Ensure the directory exists
-      const typeOutputDir = path.dirname(options.typeOutputPath)
-      if (!fs.existsSync(typeOutputDir)) {
-        fs.mkdirSync(typeOutputDir, { recursive: true })
-      }
-
-      fs.writeFileSync(options.typeOutputPath, typeDefinitions)
-      log.info(`Generated TypeScript types at: ${options.typeOutputPath}`, {
-        timestamp: true,
-      })
-    }
-
     return appResBundle
   }
 
-  function generateAndWriteTypes(
+  async function generateAndWriteTypes(
     appResBundle: ResBundle,
     allLangs: Set<string>,
   ) {
@@ -249,14 +229,25 @@ ${bundle}
 
     // Ensure the directory exists
     const typeOutputDir = path.dirname(options.typeOutputPath)
-    if (!fs.existsSync(typeOutputDir)) {
-      fs.mkdirSync(typeOutputDir, { recursive: true })
+    try {
+      await fsp.mkdir(typeOutputDir, { recursive: true })
+    } catch (error) {
+      // mkdir with recursive: true should not throw EEXIST, but let's be safe
+      const nodeError = error as NodeJS.ErrnoException
+      if (nodeError.code !== 'EEXIST') {
+        throw error
+      }
     }
 
-    fs.writeFileSync(options.typeOutputPath, typeDefinitions)
-    log.info(`Generated TypeScript types at: ${options.typeOutputPath}`, {
-      timestamp: true,
-    })
+    try {
+      await fsp.writeFile(options.typeOutputPath, typeDefinitions)
+      log.info(`Generated TypeScript types at: ${options.typeOutputPath}`, {
+        timestamp: true,
+      })
+    } catch (error) {
+      log.error(`Failed to write TypeScript types: ${(error as Error).message}`)
+      throw error
+    }
   }
 
   function generateBundle(
@@ -288,7 +279,7 @@ ${bundle}
       }
       return null
     },
-    load(id) {
+    async load(id) {
       if (id !== resolvedVirtualModuleId) {
         return null
       }
@@ -312,7 +303,7 @@ ${bundle}
         )
       }
 
-      generateAndWriteTypes(appResBundle, allLangs)
+      await generateAndWriteTypes(appResBundle, allLangs)
 
       for (const file of loadedFiles) {
         this.addWatchFile(file)

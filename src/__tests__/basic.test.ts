@@ -35,15 +35,15 @@ describe('basic', () => {
 
       it.concurrent('should generate the structure', async () => {
         const load = factory({ paths: [appLocalesDir] }).load
-        const res = (load as any).call(
+        const res = (await (load as any).call(
           thisScope,
           resolvedVirtualModuleId,
-        ) as string
+        )) as string
         const resStore = await import(esm(res))
         assertCommon(resStore)
       })
 
-      it.concurrent('should process include', () => {
+      it.concurrent('should process include', async () => {
         const load = factory({
           paths: [appLocalesDir],
           include: ['**/*.json'],
@@ -52,7 +52,7 @@ describe('basic', () => {
           expect(path).not.toMatch(/main\.nonjson/)
         }
 
-        const res = (load as any).call(thisScope, resolvedVirtualModuleId)
+        const res = await (load as any).call(thisScope, resolvedVirtualModuleId)
       })
 
       it.concurrent('should not process files that are excluded', async () => {
@@ -65,10 +65,10 @@ describe('basic', () => {
           expect(path).not.toMatch(/exclude\.json/)
         }
 
-        const res = (load as any).call(
+        const res = (await (load as any).call(
           thisScope,
           resolvedVirtualModuleId,
-        ) as string
+        )) as string
         const resStore = await import(esm(res))
         expect(resStore.de.main.foo).toStrictEqual(undefined)
         assertCommon(resStore)

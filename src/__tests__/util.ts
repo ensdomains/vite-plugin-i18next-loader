@@ -1,4 +1,8 @@
+import fs from 'node:fs/promises'
+import os from 'node:os'
+import path from 'node:path'
 import type { Plugin } from 'vite'
+import { test } from 'vitest'
 
 export interface ThisScope {
   addWatchFile: (id: string) => void
@@ -35,3 +39,24 @@ export type LoaderPlugin = WithRequired<Plugin, 'load'>
 export function esm(js: string) {
   return `data:text/javascript;base64,${btoa(js)}`
 }
+
+interface TmpDirFixture {
+  tmpdir: string
+}
+
+async function createTempDir() {
+  const ostmpdir = os.tmpdir()
+  const tmpdir = path.join(ostmpdir, 'vite-plugin-i18next-loader-test-')
+  return await fs.mkdtemp(tmpdir)
+}
+
+export const tmpdirTest = test.extend<TmpDirFixture>({
+  // biome-ignore lint/correctness/noEmptyPattern: Required by vitest: The first argument inside a fixture must use object destructuring pattern
+  tmpdir: async ({}, use) => {
+    const directory = await createTempDir()
+
+    await use(directory)
+
+    await fs.rm(directory, { recursive: true })
+  },
+})
